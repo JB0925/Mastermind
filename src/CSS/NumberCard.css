@@ -1,0 +1,20 @@
+.NumberCard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 1000ms;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+  width: 150px;
+  height: 150px;
+  margin-left: 50px;
+}
+
+.hide {
+  font-size: 2rem;
+  opacity: 0;
+}
+
+.show {
+  font-size: 2rem;
+  opacity: 1;
+}
