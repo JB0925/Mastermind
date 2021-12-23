@@ -2,6 +2,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
   padding: 25px;
   box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+  position: relative;
+  height: 100vh;
+}
+
+.NumberContainer-numbers {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#guesses-left {
+  position: absolute;
+  top: 0;
+  right: 50px;
 }

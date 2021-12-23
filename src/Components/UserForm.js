@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../CSS/UserForm.css";
 
-export default function UserForm({ setCurrentUserGuess, numberOfUserGuesses }) {
+export default function UserForm({ setCurrentUserGuess, numberOfUserGuesses, hasWon }) {
   const ANSWER_LENGTH = 4;
   const [formState, setFormState] = useState("");
 
@@ -17,7 +17,7 @@ export default function UserForm({ setCurrentUserGuess, numberOfUserGuesses }) {
     if (acceptableUserGuess(formState)) {
       setCurrentUserGuess(userGuess => formState);
     }
-    
+
     setFormState(formState => "");
   };
 
@@ -32,7 +32,7 @@ export default function UserForm({ setCurrentUserGuess, numberOfUserGuesses }) {
         onChange={handleChange}
         placeholder="Enter an integer number, i.e. 7, 2"
         required
-        disabled={numberOfUserGuesses === 10}
+        disabled={numberOfUserGuesses === 0 || hasWon}
       />
       <button type="submit">Submit</button>
     </form>
