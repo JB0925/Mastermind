@@ -1,7 +1,12 @@
 import React, { useState } from "react";
+import { useGameContext } from "../useUpdateGame";
 import "../CSS/UserForm.css";
 
-export default function UserForm({ setCurrentUserGuess, numberOfUserGuesses, hasWon }) {
+
+// basic form for the user to submit guesses. Uses the dispatch from Context
+// to update state for the parent App.
+export default function UserForm() {
+  const [{ numberOfUserGuesses, hasWon }, dispatch] = useGameContext();
   const ANSWER_LENGTH = 4;
   const [formState, setFormState] = useState("");
 
@@ -15,7 +20,7 @@ export default function UserForm({ setCurrentUserGuess, numberOfUserGuesses, has
   const handleSubmit = evt => {
     evt.preventDefault();
     if (acceptableUserGuess(formState)) {
-      setCurrentUserGuess(userGuess => formState);
+      dispatch({ type: "update current user guess", payload: formState });
     }
 
     setFormState(formState => "");

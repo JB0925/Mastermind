@@ -1,12 +1,15 @@
 import './App.css';
 import NumberContainer from './Components/NumberContainer';
+import { GameProvider } from "./useUpdateGame";
 
 function App() {
 
   return (
-    <div className="App">
-      <NumberContainer />
-    </div>
+    <GameProvider>
+      <div className="App">
+        <NumberContainer />
+     </div>
+    </GameProvider>
   );
 }
 
