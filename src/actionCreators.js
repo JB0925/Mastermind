@@ -1,4 +1,4 @@
-import { OUT_OF_GUESSES, WON_GAME, NEXT_TURN, GET_NUMBERS, UPDATE_USER_ANSWER } from "./actionTypes";
+import { OUT_OF_GUESSES, WON_GAME, NEXT_TURN, GET_NUMBERS, RESET } from "./actionTypes";
 
 const noMoreGuesses = () => {
   return {
@@ -28,14 +28,14 @@ const getGameNumbers = newGameNumberData => {
   };
 };
 
-const createNewUserAnswer = newUserAnswer => {
+const resetGame = () => {
   return {
-    type: UPDATE_USER_ANSWER,
-    payload: newUserAnswer
+    type: RESET
   };
 };
 
 export {
-  noMoreGuesses, userWonGame, setupNextTurn,
-  getGameNumbers, createNewUserAnswer
+  noMoreGuesses, userWonGame, 
+  setupNextTurn, getGameNumbers,
+  resetGame
 };

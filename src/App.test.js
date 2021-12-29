@@ -1,9 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import axios from 'axios';
 import App from './App';
 import GameMessage from './Components/GameMessages';
 import NumberCard from './Components/NumberCard';
-import NumberContainer from './Components/NumberContainer';
 import UserForm from './Components/UserForm';
 import { GameProvider } from "./useUpdateGame";
 

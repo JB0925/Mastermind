@@ -14,7 +14,6 @@ const GameProvider = ({ children }) => {
     gameNumbers: "",
     numberOfUserGuesses: 10,
     currentUserGuess: "",
-    userFinalAnswer: "____",
     message: "Waiting for your first guess...",
     hasWon: false
   };
