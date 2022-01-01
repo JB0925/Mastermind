@@ -28,4 +28,6 @@ function NumberCard({ number, isKnown }) {
   );
 };
 
+// The card doesn't need to constantly re-render, so we
+// wrap it in a call to React.memo.
 export default React.memo(NumberCard);
