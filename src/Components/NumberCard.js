@@ -4,7 +4,7 @@ import "../CSS/NumberCard.css";
 // The card that displays the gameNumbers at the end of the game.
 // fades in to show card values if either a). the user has won
 // or b). the game is over.
-export default function NumberCard({ number, isKnown }) {
+function NumberCard({ number, isKnown }) {
   const numberRef = useRef();
 
   useLayoutEffect(() => {
@@ -27,3 +27,5 @@ export default function NumberCard({ number, isKnown }) {
     </div>
   );
 };
+
+export default React.memo(NumberCard);
