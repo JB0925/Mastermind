@@ -37,11 +37,15 @@ export default function ResetButton() {
         onClick={handleClick}
         onMouseOver={handleMouseOver}
         onMouseOut={handleMouseOut}
-      >Reset</button>
+      >
+        Reset
+      </button>
       <div 
         className="reset-message"
         ref={hiddenDivRef}
-      >{hiddenDivMessage}</div>
+      >
+        {hiddenDivMessage}
+      </div>
     </div>
   );
 };

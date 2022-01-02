@@ -66,7 +66,17 @@ export default function NumberContainer() {
    * a counter out of them, which makes it easier to determine 
    * if the user has found values in the gameNumbers or not,
    * and whether or not they are in the correct place within
-   * the game numbers.
+   * the game numbers. 
+   * 
+   * Most importantly, it makes it easy 
+   * to check if the user has entered a value that has already
+   * been accounted for. For example, if a user enters "5555",
+   * and the number is "6545", we can use this counter Object
+   * to say "ok, well, there are only two fives in this number,
+   * so the user has only found two of our four numbers", rather
+   * than telling the user "you found four of our numbers" and
+   * them thinking "well, if I found all the numbers, why didn't
+   * I win?"
    * 
    */
   const createGameNumbersCounter = useCallback(() => {
@@ -112,7 +122,7 @@ export default function NumberContainer() {
 
   
   /**
-   * checkIfUserProvidedValueIsInNumbers
+   * checkIfUserProvidedValueIsInCorrectPlace
    * 
    * Params:
    *    - userProvidedValue: String
@@ -186,6 +196,13 @@ export default function NumberContainer() {
     dispatch(setupNextTurn(userFeedback));
   },[dispatch]);
 
+  
+  // A check to see if the user has won the game
+  // by checking to see if all of their numbers 
+  // match the game numbers
+  const userAnswerMatchesGameNumbers= numbersInCorrectPlace => {
+    return numbersInCorrectPlace === TOTAL_DIGITS;
+  };
 
   /**
    * analyzeUserAnswer
@@ -208,16 +225,17 @@ export default function NumberContainer() {
     let gameNumberCounter = createGameNumbersCounter();
 
     for (let i = 0; i < TOTAL_DIGITS; i++) {
-      let currentValue = currentUserGuess[i];
+      let currentUserValue = currentUserGuess[i];
+      let currentGameNumberValue = gameNumbers[i];
     
       // check to see if the current value is in the gameNumbers at all and that it hasn't already been "seen"
       numberOfDigitsInGameNumbers = checkIfUserProvidedValueIsInNumbers(
-        gameNumberCounter, currentValue, numberOfDigitsInGameNumbers
+        gameNumberCounter, currentUserValue, numberOfDigitsInGameNumbers
       );
     
       // check to see if the current value is in the right place in the gameNumbers
       numberOfDigitsInCorrectPlace = checkIfUserProvidedValueIsInCorrectPlace(
-          currentValue, gameNumbers[i], numberOfDigitsInCorrectPlace
+          currentUserValue, currentGameNumberValue, numberOfDigitsInCorrectPlace
       );
     };
 
@@ -252,7 +270,7 @@ export default function NumberContainer() {
     // if not outOfGuesses, check to see if the user won
     const { numberOfDigitsInGameNumbers, numberOfDigitsInCorrectPlace } = analyzeUserAnswer();
 
-    if (numberOfDigitsInCorrectPlace === TOTAL_DIGITS) {
+    if (userAnswerMatchesGameNumbers(numberOfDigitsInCorrectPlace)) {
       handleUserWonScenario();
       return;
     };
@@ -304,14 +322,15 @@ export default function NumberContainer() {
   // creating NumberCard components based on the gameNumbers.
   const createGameNumberCards = () => {
     if(!gameNumbers) return;
+
     return gameNumbers.map(
         (number, index) => <NumberCard 
                     number={number} 
                     isKnown={numberOfUserGuesses === 0 || hasWon} 
                     key={number+index}
                   />
-    )
-  }
+    );
+  };
 
   return (
     <div className="NumberContainer">

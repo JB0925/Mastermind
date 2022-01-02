@@ -10,45 +10,51 @@ export default function UserForm() {
   const [{ numberOfUserGuesses, hasWon, currentUserGuess }, dispatch] = useGameContext();
   const ANSWER_LENGTH = 4;
   const digitsUsedInGame = "12345670".split("");
-  const [formState, setFormState] = useState("");
+  const [newUserAnswer, setNewUserAnswer] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = evt => {
     const { value } = evt.target;
-    setFormState(formState => value);
+    setNewUserAnswer(newUserAnswer => value);
   };
-
-  const userAnswerIsAllDigits = userGuess => {
+  
+  // ensuring that the user has entered digits from 0 - 7
+  const userAnswerIsAllValidDigits = userGuess => {
     return userGuess.split("").every(character => digitsUsedInGame.includes(character));
   };
-
+  
+  // if the user has made an error, save an error message in state to display in the browser
   const handleErrorSetting = () => {
-    const answerSameAsBefore = currentUserGuess === formState;
-    const answerTooShort = formState.length < ANSWER_LENGTH;
-    const answerTooLong = formState.length > ANSWER_LENGTH;
+    const answerSameAsBefore = currentUserGuess === newUserAnswer;
+    const answerTooShort = newUserAnswer.length < ANSWER_LENGTH;
+    const answerTooLong = newUserAnswer.length > ANSWER_LENGTH;
 
     if (answerSameAsBefore) setErrorMessage("Error: you just guessed this!");
     else if (answerTooShort) setErrorMessage("Error: your answer is too short.");
     else if (answerTooLong) setErrorMessage("Error: your answer is too long.");
-    else if (!userAnswerIsAllDigits(formState)) setErrorMessage("Error: Enter digits from 0-7");
+    else if (!userAnswerIsAllValidDigits(newUserAnswer)) setErrorMessage("Error: Enter digits from 0-7");
   };
-
+  
+  // check to make sure the user's guess is valid before setting it in state
   const acceptableUserGuess = () => {
-    return formState.length === ANSWER_LENGTH && 
-      currentUserGuess !== formState &&
-      userAnswerIsAllDigits(formState);
+    return newUserAnswer.length === ANSWER_LENGTH && 
+      currentUserGuess !== newUserAnswer &&
+      userAnswerIsAllValidDigits(newUserAnswer);
   };
-
+  
+  // if the user's answer is valid, update the state managed by the reducer
+  // if not, update the internal errorMessage state, to be displayed in browser
+  // either way, clear the user's answer from the input / reset "newUserAnswer"
   const handleSubmit = evt => {
     evt.preventDefault();
     if (acceptableUserGuess()) {
-      dispatch({ type: "update current user guess", payload: formState });
-      setErrorMessage("");
+      dispatch({ type: "update current user guess", payload: newUserAnswer });
+      errorMessage.length && setErrorMessage("");
     } else {
         handleErrorSetting();
     }
 
-    setFormState(formState => "");
+    setNewUserAnswer(newUserAnswer => "");
   };
 
   return (
@@ -58,7 +64,7 @@ export default function UserForm() {
         type="text"
         id="guess"
         name="guess"
-        value={formState}
+        value={newUserAnswer}
         onChange={handleChange}
         placeholder="Enter an integer number, i.e. 7, 2"
         required
