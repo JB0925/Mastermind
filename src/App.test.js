@@ -1,4 +1,5 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import axios from 'axios';
 import App from './App';
 import GameMessage from './Components/GameMessages';
 import NumberCard from './Components/NumberCard';
@@ -6,10 +7,14 @@ import UserForm from './Components/UserForm';
 import { GameProvider } from "./useUpdateGame";
 
 describe("Do the components render?", () => {
-  it("renders the App component", () => {
-    render(<App />);
+  it("renders the App component", async() => {
+    const fakeResponse = {data: "1234\n"};
+    jest.spyOn(axios, "get").mockResolvedValue(fakeResponse);
+    render(<App />)
+    
 
     expect(screen.getByText("Waiting for your first guess...")).toBeInTheDocument();
+    jest.clearAllMocks();
   });
 
   it("renders the GameMessage component", () => {
@@ -77,6 +82,8 @@ describe("Do the components render?", () => {
 describe("Do the various components work together as intended?", () => {
   it("demonstrates that the App component is interactive and updates with user events", async() => {
     const GUESSES = 10;
+    const fakeResponse = {data: "1234\n"};
+    jest.spyOn(axios, "get").mockResolvedValue(fakeResponse);
     render(<App />)
     
     const submitButton = screen.getByText("Submit");
@@ -104,5 +111,6 @@ describe("Do the various components work together as intended?", () => {
     }
     
     expect(screen.getByText("Sorry, you've run out of guesses!")).toBeInTheDocument();
+    jest.clearAllMocks();
   });
 });
