@@ -12,23 +12,40 @@ export default function NumberContainer() {
   const TOTAL_DIGITS = 4;
   const BASE_URL = "https://www.random.org/integers/";
 
-  const getGameRequestParams = () => ({
+  const params = useMemo(() => ({
     num: 4, min: 0, max: 7,
     col: 1, base: 10, format: "plain",
     rnd: "new"
-  });
-  const params = useMemo(() => getGameRequestParams(),[]);
+  }),[]);
+  
 
   const [{ gameNumbers, numberOfUserGuesses, currentUserGuess, hasWon }, dispatch] = useGameContext();
-    
+  
+
   const createArrayFromNumbers = numbers => numbers.split("\n").filter(num => num !== "");
   
-  // Takes a message and how many digits were in the user's number that match the gameNumbers.
-  // If the user has found all unique digits in gameNumbers,
-  // it lets them know that. Otherwise, it returns the original message,
-  // including how many of their numbers are in the correct place.
-  const setUpdatedMessage = ({ message, userNumbersFound }) => {
-    if (userNumbersFound === TOTAL_DIGITS) {
+  /** 
+   *  setUpdatedMessage
+   * 
+   * Params: 
+   *    - numberOfDigitsInGameNumbers: Number
+   *    - numberOfDigitsInCorrectPlace: Number
+   * 
+   * Returns:
+   *    - message: String
+   * 
+   * Takes how many digits were in the user's number that match the gameNumbers,
+   * as well as how many were in the correct place.
+   * Creates a "standard" message to return to the user from those values.
+   * If the user has found all unique digits in gameNumbers,
+   * the message is updated and returned. Otherwise, it returns the original message,
+   * 
+   */
+  const createFeedbackMessage = ({ numberOfDigitsInGameNumbers, numberOfDigitsInCorrectPlace }) => {
+    const message = `${numberOfDigitsInGameNumbers} of your numbers are in our number
+    and ${numberOfDigitsInCorrectPlace} are in the right place.`;
+
+    if (numberOfDigitsInGameNumbers === TOTAL_DIGITS) {
       const amountInCorrectPlaceMessage = message.split("and")[1];
       return `You have found all unique digits in our number. 
               ${amountInCorrectPlaceMessage}`;
@@ -37,73 +54,220 @@ export default function NumberContainer() {
     return message;
   };
   
-  const giveUserFeedback = useCallback(() => {
-    const userOutOfGuesses = numberOfUserGuesses === 0;
-
-    // returns an object with a count of how many of each digit there are in the game numbers
-    const createGameNumbersCounter = () => {
-      let gameNumberCounter = {};
-      let counterKeys = new Set(Object.keys(gameNumberCounter));
-    
-      for (let number of gameNumbers) {
-        if (!counterKeys.has(number)) {
-          gameNumberCounter[number] = 1
-          counterKeys.add(number);
-        } else {
-            gameNumberCounter[number]++;
-        };
+  /**
+   *  createGameNumbersCounter
+   * 
+   * Params: None
+   *
+   * Returns:
+   *    - gameNumberCounter: Object
+   * 
+   * This function takes the current game numbers and creates
+   * a counter out of them, which makes it easier to determine 
+   * if the user has found values in the gameNumbers or not,
+   * and whether or not they are in the correct place within
+   * the game numbers.
+   * 
+   */
+  const createGameNumbersCounter = useCallback(() => {
+    let gameNumberCounter = {};
+    let counterKeys = new Set(Object.keys(gameNumberCounter));
+  
+    for (let number of gameNumbers) {
+      if (!counterKeys.has(number)) {
+        gameNumberCounter[number] = 1
+        counterKeys.add(number);
+      } else {
+          gameNumberCounter[number]++;
       };
-      
-      return gameNumberCounter;
     };
     
-    // handle outOfGuesses scenario
-    if (userOutOfGuesses) {
-      dispatch(noMoreGuesses());
-      return;
+    return gameNumberCounter;
+  },[gameNumbers]);
+
+  
+  /**
+   * checkIfUserProvidedValueIsInNumbers
+   * 
+   * Params:
+   *    - counterObject: Object
+   *    - userProvidedValue: String
+   *    - totalDigitsInNumber: Number
+   * 
+   * Returns: 
+   *    - A Number data type representing how many of the user's digits (thus far)
+   *      are in the game numbers
+   * 
+   * Purpose:
+   *    - A helper function for the "analyzeUserAnswer" function
+   * 
+   */
+  const checkIfUserProvidedValueIsInNumbers = (counterObject, userProviedValue, totalDigitsInNumber) => {
+    if (counterObject[userProviedValue]) {
+      totalDigitsInNumber++
+      counterObject[userProviedValue]--;
     };
-    
-    // determine how many digits the user got correct, and how many are in the correct place
+    return totalDigitsInNumber;
+  };
+
+  
+  /**
+   * checkIfUserProvidedValueIsInNumbers
+   * 
+   * Params:
+   *    - userProvidedValue: String
+   *    - currentGameNumberValue: String
+   *    - totalDigitsInCorrectPlace: Number
+   * 
+   * Returns: 
+   *    - A Number data type representing how many of the user's digits (thus far)
+   *      are in the correct place within the game numbers
+   * 
+   * Purpose:
+   *    - A helper function for the "analyzeUserAnswer" function
+   * 
+   */
+  const checkIfUserProvidedValueIsInCorrectPlace = (userProviedValue, currentGameNumberValue, totalDigitsInCorrectPlace) => {
+    if (userProviedValue === currentGameNumberValue) {
+      totalDigitsInCorrectPlace++;
+    };
+
+    return totalDigitsInCorrectPlace;
+  };
+  
+  
+  /**
+   * handleOutOfGuessesScenario
+   * 
+   * Params: None
+   * 
+   * Returns: None
+   * 
+   * Purpose:
+   *    - to call the dispatch function, which will update
+   *      state, indicating that the user is out of guesses
+   *      and signal that the game is over.
+   */
+  const handleOutOfGuessesScenario = useCallback(() => {
+    dispatch(noMoreGuesses());
+  },[dispatch]);
+
+
+  /**
+   * handleUserWonScenario
+   * 
+   * Params: None
+   * 
+   * Returns: None
+   * 
+   * Purpose:
+   *    - to call the dispatch function, which will update
+   *      state and signal that the user has won and the game is over.
+   */
+   const handleUserWonScenario = useCallback(() => {
+    dispatch(userWonGame());
+  },[dispatch]);
+
+
+  /**
+   * handleNextTurn
+   * 
+   * Params:
+   *    - userFeedback: String
+   * 
+   * Returns: None
+   * 
+   * Purpose:
+   *    - to call the dispatch function, which will update
+   *      state with a new feedback message for the user, 
+   *      and signal that the user is ready for their next turn.
+   */
+   const handleNextTurn = useCallback(userFeedback => {
+    dispatch(setupNextTurn(userFeedback));
+  },[dispatch]);
+
+
+  /**
+   * analyzeUserAnswer
+   * 
+   * Params: None
+   * 
+   * Returns:
+   *    An Object with two values:
+   *        1). The amount of numbers the user has found
+   *        2). The amount that the user guessed that are
+   *            also in the correct place.
+   *   
+   *    This is used to create a feedback message to display
+   *    to the user.
+   * 
+   */
+  const analyzeUserAnswer = useCallback(() => {
     let numberOfDigitsInGameNumbers = 0;
     let numberOfDigitsInCorrectPlace = 0;
     let gameNumberCounter = createGameNumbersCounter();
 
     for (let i = 0; i < TOTAL_DIGITS; i++) {
       let currentValue = currentUserGuess[i];
-      
-      // check to see if the current value is in the gameNumbers at all and that it hasn't already been "seen"
-      if (gameNumberCounter[currentValue]) {
-          numberOfDigitsInGameNumbers++
-          gameNumberCounter[currentValue]--;
-      };
-      
-      // check to see if the current value is in the right place in the gameNumbers
-      if (currentValue === gameNumbers[i]) {
-        numberOfDigitsInCorrectPlace++;
-      };
-    };
     
-    // check to see if the user won
-    if (numberOfDigitsInCorrectPlace === TOTAL_DIGITS) {
-      dispatch(userWonGame());
+      // check to see if the current value is in the gameNumbers at all and that it hasn't already been "seen"
+      numberOfDigitsInGameNumbers = checkIfUserProvidedValueIsInNumbers(
+        gameNumberCounter, currentValue, numberOfDigitsInGameNumbers
+      );
+    
+      // check to see if the current value is in the right place in the gameNumbers
+      numberOfDigitsInCorrectPlace = checkIfUserProvidedValueIsInCorrectPlace(
+          currentValue, gameNumbers[i], numberOfDigitsInCorrectPlace
+      );
+    };
+
+    return { numberOfDigitsInGameNumbers, numberOfDigitsInCorrectPlace };
+  }, [createGameNumbersCounter, currentUserGuess, gameNumbers]);
+
+
+  /**
+   * giveUserFeedback
+   * 
+   * Params: None
+   * 
+   * Returns: None
+   * 
+   * Purpose:
+   *    This function dispatches an action to the gameReducer function, 
+   *    which is then used to update the state of the app. This handles three
+   *    scenarios:
+   *        1). The user is out of guesses.
+   *        2). The user has won.
+   *        3). The user is getting ready for their next turn.
+   * 
+   */
+  const giveUserFeedback = useCallback(() => {
+    const userOutOfGuesses = numberOfUserGuesses === 0;
+
+    if (userOutOfGuesses) {
+      handleOutOfGuessesScenario();
       return;
-    }
+    };
+
+    // if not outOfGuesses, check to see if the user won
+    const { numberOfDigitsInGameNumbers, numberOfDigitsInCorrectPlace } = analyzeUserAnswer();
+
+    if (numberOfDigitsInCorrectPlace === TOTAL_DIGITS) {
+      handleUserWonScenario();
+      return;
+    };
     
     // if the user hasn't won, and isn't out of guesses, we give them information for
-    // the next turn. Give them extra feedback if they've found all unique numbers.
-    let updatedMessage = `${numberOfDigitsInGameNumbers} of your numbers are in our number
-        and ${numberOfDigitsInCorrectPlace} are in the right place.`;
+    // their next turn to let them know how many numbers they found, and how many are in the
+    // correct place.
     
-    let messageData = {
-      message: updatedMessage, 
-      userNumbersFound: numberOfDigitsInGameNumbers
-    };
-    
-    // determine if the user has found all unique digits and, if so, let them know.
-    updatedMessage = setUpdatedMessage(messageData);
-    
-    dispatch(setupNextTurn(updatedMessage));
-  },[currentUserGuess, dispatch, gameNumbers, numberOfUserGuesses]);
+    const userFeedback = createFeedbackMessage({ numberOfDigitsInGameNumbers, numberOfDigitsInCorrectPlace });
+    handleNextTurn(userFeedback);
+
+  },[numberOfUserGuesses, analyzeUserAnswer, handleNextTurn, 
+    handleOutOfGuessesScenario, handleUserWonScenario
+  ]);
+
     
   // get initial game numbers from API as page loads
   useEffect(() => {
@@ -122,6 +286,7 @@ export default function NumberContainer() {
       mounted = false;
     };
   },[params, dispatch, gameNumbers.length]);
+
   
   // an effect that runs every time the user's current guess changes.
   // compares the user's guess with the actual numbers and updates their guess,
