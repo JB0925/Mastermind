@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useGameContext } from "../useUpdateGame";
+import { updateUserGuess } from "../actionCreators";
 import "../CSS/UserForm.css";
 
 
@@ -48,7 +49,7 @@ export default function UserForm() {
   const handleSubmit = evt => {
     evt.preventDefault();
     if (acceptableUserGuess()) {
-      dispatch({ type: "update current user guess", payload: newUserAnswer });
+      dispatch(updateUserGuess(newUserAnswer));
       errorMessage.length && setErrorMessage("");
     } else {
         handleErrorSetting();

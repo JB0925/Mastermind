@@ -1,4 +1,4 @@
-import { OUT_OF_GUESSES, WON_GAME, NEXT_TURN, GET_NUMBERS, RESET } from "./actionTypes";
+import { OUT_OF_GUESSES, WON_GAME, NEXT_TURN, GET_NUMBERS, RESET, UPDATE_USER_GUESS } from "./actionTypes";
 
 // Rather than creating new action objects every time we want to dispatch an action to the 
 // reducer function, we can create them here, import them, and call them as needed.
@@ -31,6 +31,13 @@ const getGameNumbers = newGameNumberData => {
   };
 };
 
+const updateUserGuess = newUserGuess => {
+  return {
+    type: UPDATE_USER_GUESS,
+    payload: newUserGuess
+  };
+};
+
 const resetGame = () => {
   return {
     type: RESET
@@ -40,5 +47,5 @@ const resetGame = () => {
 export {
   noMoreGuesses, userWonGame, 
   setupNextTurn, getGameNumbers,
-  resetGame
+  resetGame, updateUserGuess
 };

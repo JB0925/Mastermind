@@ -25,7 +25,7 @@ export default function NumberContainer() {
   const createArrayFromNumbers = numbers => numbers.split("\n").filter(num => num !== "");
   
   /** 
-   *  setUpdatedMessage
+   *  createFeedbackMessage
    * 
    * Params: 
    *    - numberOfDigitsInGameNumbers: Number
