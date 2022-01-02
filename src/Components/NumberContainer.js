@@ -175,8 +175,8 @@ export default function NumberContainer() {
    *      state and signal that the user has won and the game is over.
    */
    const handleUserWonScenario = useCallback(() => {
-    dispatch(userWonGame());
-  },[dispatch]);
+     dispatch(userWonGame());
+   },[dispatch]);
 
 
   /**
@@ -193,14 +193,14 @@ export default function NumberContainer() {
    *      and signal that the user is ready for their next turn.
    */
    const handleNextTurn = useCallback(userFeedback => {
-    dispatch(setupNextTurn(userFeedback));
-  },[dispatch]);
+      dispatch(setupNextTurn(userFeedback));
+    },[dispatch]);
 
   
   // A check to see if the user has won the game
   // by checking to see if all of their numbers 
   // match the game numbers
-  const userAnswerMatchesGameNumbers= numbersInCorrectPlace => {
+  const userAnswerMatchesGameNumbers = numbersInCorrectPlace => {
     return numbersInCorrectPlace === TOTAL_DIGITS;
   };
 

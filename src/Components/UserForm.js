@@ -7,8 +7,8 @@ import "../CSS/UserForm.css";
 // to update state for the parent App. Does some basic error handling too,
 // without decrementing the user's guesses.
 export default function UserForm() {
-  const [{ numberOfUserGuesses, hasWon, currentUserGuess }, dispatch] = useGameContext();
-  const ANSWER_LENGTH = 4;
+  const [{ numberOfUserGuesses, hasWon, currentUserGuess: currentUserGuessInState }, dispatch] = useGameContext();
+  const ACCEPTABLE_ANSWER_LENGTH = 4;
   const digitsUsedInGame = "12345670".split("");
   const [newUserAnswer, setNewUserAnswer] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -25,9 +25,9 @@ export default function UserForm() {
   
   // if the user has made an error, save an error message in state to display in the browser
   const handleErrorSetting = () => {
-    const answerSameAsBefore = currentUserGuess === newUserAnswer;
-    const answerTooShort = newUserAnswer.length < ANSWER_LENGTH;
-    const answerTooLong = newUserAnswer.length > ANSWER_LENGTH;
+    const answerSameAsBefore = currentUserGuessInState === newUserAnswer;
+    const answerTooShort = newUserAnswer.length < ACCEPTABLE_ANSWER_LENGTH;
+    const answerTooLong = newUserAnswer.length > ACCEPTABLE_ANSWER_LENGTH;
 
     if (answerSameAsBefore) setErrorMessage("Error: you just guessed this!");
     else if (answerTooShort) setErrorMessage("Error: your answer is too short.");
@@ -37,8 +37,8 @@ export default function UserForm() {
   
   // check to make sure the user's guess is valid before setting it in state
   const acceptableUserGuess = () => {
-    return newUserAnswer.length === ANSWER_LENGTH && 
-      currentUserGuess !== newUserAnswer &&
+    return newUserAnswer.length === ACCEPTABLE_ANSWER_LENGTH && 
+      currentUserGuessInState !== newUserAnswer &&
       userAnswerIsAllValidDigits(newUserAnswer);
   };
   

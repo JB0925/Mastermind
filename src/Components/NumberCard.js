@@ -3,7 +3,7 @@ import "../CSS/NumberCard.css";
 
 // The card that displays the gameNumbers at the end of the game.
 // fades in to show card values if either a). the user has won
-// or b). the game is over.
+// or b). the game is over because the user ran out of guesses.
 function NumberCard({ number, isKnown }) {
   const numberRef = useRef();
 
@@ -13,7 +13,7 @@ function NumberCard({ number, isKnown }) {
         numberRef.current.style.opacity = "1";
         numberRef.current.style.transition ="opacity 2000ms"
       },100)
-    }
+    };
   }, [isKnown])
 
   const showNumber = () => {
@@ -28,6 +28,6 @@ function NumberCard({ number, isKnown }) {
   );
 };
 
-// The card doesn't need to constantly re-render, so we
-// wrap it in a call to React.memo.
+// The card doesn't need to constantly re-render because its props only change
+// when the game is over, so we wrap it in a call to React.memo.
 export default React.memo(NumberCard);
