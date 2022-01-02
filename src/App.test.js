@@ -5,6 +5,7 @@ import GameMessage from './Components/GameMessages';
 import NumberCard from './Components/NumberCard';
 import UserForm from './Components/UserForm';
 import { GameProvider } from "./useUpdateGame";
+import ResetButton from './Components/ResetButton';
 
 describe("Do the components render?", () => {
   it("renders the App component", async() => {
@@ -12,8 +13,9 @@ describe("Do the components render?", () => {
     jest.spyOn(axios, "get").mockResolvedValue(fakeResponse);
     render(<App />)
     
-
-    expect(screen.getByText("Waiting for your first guess...")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Waiting for your first guess...")).toBeInTheDocument();
+    });
     jest.clearAllMocks();
   });
 
@@ -22,7 +24,7 @@ describe("Do the components render?", () => {
       <GameProvider>
         <GameMessage />
       </GameProvider>
-    )
+    );
 
     expect(screen.getByText("Waiting for your first guess...")).toBeInTheDocument();
   });
@@ -61,13 +63,13 @@ describe("Do the components render?", () => {
     expect(screen.getByText("Guess a Number From 0 - 7")).toBeInTheDocument();
   });
 
-  it("renders the UserForm component and submits a guess", () => {
+  it("renders the UserForm component, submits a guess, and handles errors", () => {
     render(
       <GameProvider>
         <UserForm />
       </GameProvider>
-    )
-    
+    );
+
     const submitButton = screen.getByText("Submit");
     const input = screen.getByPlaceholderText("Enter an integer number, i.e. 7, 2");
     
@@ -76,6 +78,38 @@ describe("Do the components render?", () => {
 
     fireEvent.click(submitButton);
     expect(input.value).toBe("");
+
+    fireEvent.change(input, { target: { value: "4321" }});
+    fireEvent.click(submitButton);
+    expect(screen.getByText("Error: you just guessed this!")).toBeInTheDocument();
+
+    fireEvent.change(input, { target: { value: "6789" }});
+    fireEvent.click(submitButton);
+    expect(screen.getByText("Error: Enter digits from 0-7")).toBeInTheDocument();
+
+    fireEvent.change(input, { target: { value: "abcd" }});
+    fireEvent.click(submitButton);
+    expect(screen.getByText("Error: Enter digits from 0-7")).toBeInTheDocument();
+
+    fireEvent.change(input, { target: { value: "123" }});
+    fireEvent.click(submitButton);
+    expect(screen.getByText("Error: your answer is too short.")).toBeInTheDocument();
+
+    fireEvent.change(input, { target: { value: "123456" }});
+    fireEvent.click(submitButton);
+    expect(screen.getByText("Error: your answer is too long.")).toBeInTheDocument();
+  });
+
+  it("renders the ResetButton component", () => {
+    render(
+      <GameProvider>
+        <ResetButton />
+      </GameProvider>
+    );
+    const resetButton = screen.getByTestId("resetButton");
+    const messageDiv = screen.getByText("Are you sure? You will lose all progress.");
+    expect(messageDiv).toBeInTheDocument();
+    expect(resetButton).toBeInTheDocument();
   });
 });
 
@@ -84,13 +118,20 @@ describe("Do the various components work together as intended?", () => {
     const GUESSES = 10;
     const fakeResponse = {data: "1234\n"};
     jest.spyOn(axios, "get").mockResolvedValue(fakeResponse);
-    render(<App />)
-    
+    render(<App />);
+  
     const submitButton = screen.getByText("Submit");
     const input = screen.getByPlaceholderText("Enter an integer number, i.e. 7, 2");
     const guessesRemaining = screen.getByText("Guesses Remaining: 10");
+    const resetButton = screen.getByTestId("resetButton");
 
-    expect(guessesRemaining).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("1234")).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      expect(guessesRemaining).toBeInTheDocument();
+    });
 
     fireEvent.change(input, { target: { value: "4321" }});
     fireEvent.click(submitButton);
@@ -98,19 +139,36 @@ describe("Do the various components work together as intended?", () => {
     expect(screen.queryByText("Guesses Remaining: 10")).not.toBeInTheDocument();
     expect(screen.getByText("Guesses Remaining: 9")).toBeInTheDocument();
     expect(screen.queryByText("Waiting for your first guess...")).not.toBeInTheDocument();
+    expect(screen.getByText("Are you sure? You will lose all progress.")).toBeInTheDocument();
 
     for (let i = 0; i < GUESSES - 1; i++) {
       let answer;
       if (i % 2 === 0) {
-        answer = "1234"
+        answer = "4567"
       } else {
         answer = "4321"
       }
       fireEvent.change(input, { target: { value: answer }});
       fireEvent.click(submitButton);
-    }
+    };
     
     expect(screen.getByText("Sorry, you've run out of guesses!")).toBeInTheDocument();
+    expect(screen.getByText("Play again?")).toBeInTheDocument();
+
+    // Clearing the old mock and hitting the reset button to start over
+    jest.clearAllMocks();
+    const newFakeResponse = {data: "4567\n"};
+    jest.spyOn(axios, "get").mockResolvedValue(newFakeResponse);
+    fireEvent.click(resetButton);
+
+    await waitFor(() => {
+      expect(screen.getByText("Waiting for your first guess...")).toBeInTheDocument();
+    });
+    
+    await waitFor(() => {
+      expect(screen.getByText("4567")).toBeInTheDocument();
+    });
+
     jest.clearAllMocks();
   });
 });

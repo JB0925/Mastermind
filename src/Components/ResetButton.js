@@ -37,6 +37,7 @@ export default function ResetButton() {
         onClick={handleClick}
         onMouseOver={handleMouseOver}
         onMouseOut={handleMouseOut}
+        data-testid="resetButton"
       >
         Reset
       </button>
