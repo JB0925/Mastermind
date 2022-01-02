@@ -13,7 +13,7 @@ when either the user wins the game, or the user runs out of guesses.
 # How To Install and/or View Mastermind
 
 The easiest way to view Mastermind is to head over to
-[Mastermind on Heroku]() Please allow 15-20 seconds for the
+[Mastermind on Heroku](https://powerful-taiga-58336.herokuapp.com/) Please allow 15-20 seconds for the
 page to load, as it is running on a free dyno.
 
 Alternatively, to clone this project, you can paste the following line in your terminal:
