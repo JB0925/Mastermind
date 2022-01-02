@@ -17,7 +17,7 @@ The easiest way to view Mastermind is to head over to
 page to load, as it is running on a free dyno.
 
 Alternatively, to clone this project, you can paste the following line in your terminal:
-
+`git clone git@github.com:JB0925/Mastermind.git`
 
 Following that, use `npm install` to install all dependencies in both repos separately.
 
