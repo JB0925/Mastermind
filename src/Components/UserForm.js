@@ -70,7 +70,7 @@ export default function UserForm() {
         required
         disabled={numberOfUserGuesses === 0 || hasWon}
       />
-      <button type="submit">Submit</button>
+      <button type="submit" disabled={numberOfUserGuesses === 0 || hasWon}>Submit</button>
       {errorMessage.length ? <p style={{color: "tomato"}}>{errorMessage}</p> : null}
     </form>
   );

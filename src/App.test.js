@@ -155,6 +155,12 @@ describe("Do the various components work together as intended?", () => {
     expect(screen.getByText("Sorry, you've run out of guesses!")).toBeInTheDocument();
     expect(screen.getByText("Play again?")).toBeInTheDocument();
 
+    fireEvent.change(input, { target: { value: "2345" }});
+    fireEvent.click(submitButton);
+
+    // expect that the user cannot still submit the form
+    expect(input.value).toBe("2345");
+
     // Clearing the old mock and hitting the reset button to start over
     jest.clearAllMocks();
     const newFakeResponse = {data: "4567\n"};
