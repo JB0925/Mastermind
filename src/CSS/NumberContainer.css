@@ -20,6 +20,11 @@
     -webkit-animation: slidein 1.5s ease-in 0s;
 }
 
+.NumberContainer i {
+  font-size: 3rem;
+  color: #0c162e;
+}
+
 .info {
   display: flex;
   align-items: center;

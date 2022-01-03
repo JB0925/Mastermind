@@ -340,7 +340,7 @@ export default function NumberContainer() {
         <h3 id="guesses-left">{`Guesses Remaining: ${numberOfUserGuesses}`}</h3>
       </div>
       <div className="NumberContainer-numbers">
-        {createGameNumberCards()}
+        {gameNumbers ? createGameNumberCards() : <i className="fas fa-spinner fa-spin"></i>}
       </div>
       <UserForm />
       <GameMessage />
