@@ -55,21 +55,21 @@ function NumberContainer() {
    * the message is updated and returned. Otherwise, it returns the original message,
    *
    */
-  const createFeedbackMessage = ({
-    numberOfDigitsInGameNumbers,
-    numberOfDigitsInCorrectPlace,
-  }) => {
-    const message = `${numberOfDigitsInGameNumbers} of your numbers are in our number
+  const createFeedbackMessage = useCallback(
+    ({ numberOfDigitsInGameNumbers, numberOfDigitsInCorrectPlace }) => {
+      const message = `${numberOfDigitsInGameNumbers} of your numbers are in our number
     and ${numberOfDigitsInCorrectPlace} are in the right place.`;
 
-    if (numberOfDigitsInGameNumbers === TOTAL_DIGITS) {
-      const amountInCorrectPlaceMessage = message.split("and")[1];
-      return `You have found all unique digits in our number. 
+      if (numberOfDigitsInGameNumbers === TOTAL_DIGITS) {
+        const amountInCorrectPlaceMessage = message.split("and")[1];
+        return `You have found all unique digits in our number. 
               ${amountInCorrectPlaceMessage}`;
-    }
+      }
 
-    return message;
-  };
+      return message;
+    },
+    [TOTAL_DIGITS]
+  );
 
   /**
    *  createGameNumbersCounter
@@ -222,9 +222,12 @@ function NumberContainer() {
   // A check to see if the user has won the game
   // by checking to see if all of their numbers
   // match the game numbers
-  const userAnswerMatchesGameNumbers = (numbersInCorrectPlace) => {
-    return numbersInCorrectPlace === TOTAL_DIGITS;
-  };
+  const userAnswerMatchesGameNumbers = useCallback(
+    (numbersInCorrectPlace) => {
+      return numbersInCorrectPlace === TOTAL_DIGITS;
+    },
+    [TOTAL_DIGITS]
+  );
 
   /**
    * analyzeUserAnswer
@@ -266,7 +269,7 @@ function NumberContainer() {
     }
 
     return { numberOfDigitsInGameNumbers, numberOfDigitsInCorrectPlace };
-  }, [createGameNumbersCounter, currentUserGuess, gameNumbers]);
+  }, [createGameNumbersCounter, currentUserGuess, gameNumbers, TOTAL_DIGITS]);
 
   /**
    * giveUserFeedback
@@ -316,6 +319,8 @@ function NumberContainer() {
     handleNextTurn,
     handleOutOfGuessesScenario,
     handleUserWonScenario,
+    createFeedbackMessage,
+    userAnswerMatchesGameNumbers,
   ]);
 
   // get initial game numbers from API as page loads
